@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <h1>这是一个ejs引擎</h1>
+    <p>接收的数据 = 号：    <%= msg %></p>
+    <p>接收的数据 - 号：    <%- msg %></p>
+    <p>接收的数据(没有号)： <% msg %></p>
+    <div>判断语句</div>
+    <% if(true) {%>
+        <p style="color:green">真的数据</p>
+    <%} else {%>
+        <p style="color:red">假的数据</p>
+    <%}%>
+
+    <% if(num >= 20) {%>
+        <p style="color:green">大于等于20</p>
+    <%} else {%>
+        <p style="color:red">小于20</p>
+    <%}%>
+
+    <% list.map((item) => {%>
+        <p style="color:red"><%=item%></p>
+    <%})%>
+    
+</body>
+</html>
