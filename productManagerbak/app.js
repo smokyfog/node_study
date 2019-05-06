@@ -5,6 +5,8 @@ const bodyParser = require("body-parser");
 const session = require("express-session");
 const md5 = require("md5-node");//密码md5加密
 const multiparty = require("multiparty");//接受表单post提交的数据，并实现上传图片
+const fs = require("fs");
+
 
 app.set("view engine", "ejs")
 app.use( express.static("public") );
@@ -136,7 +138,69 @@ app.post("/productAddDo", (req, res) => {
 
 //商品编辑
 app.get("/productedit", (req, res) => {
-    res.render("productedit");
+    //接受要修改的商品编号
+    var id = req.query.id;
+    //根据id查找商品的其他数据
+    db.fnFind("product", {_id: new db.ObjectID(id)}, (err, data) => {
+        
+        res.render("productedit",{
+            list : data[0]
+        });
+    })
+})
+
+ 
+//编辑商品
+app.post("/producteditDo", (req, res) => {
+    var form = new multiparty.Form();
+    form.uploadDir = "upload";
+    form.parse(req, (err, data, files) => {
+        var id = data.id[0];
+        var title = data.title[0];
+        var price = data.price[0];
+        var fee = data.fee[0];
+        var description = data.description[0];
+        var pic = files.pic[0].path;
+        var originalFilename = files.pic[0].originalFilename;
+        var updateJson = {};
+        if(originalFilename){
+            updateJson = {
+                title,
+                price,
+                fee,
+                description,
+                pic
+            }
+        }else{
+            updateJson = {
+                title,
+                price,
+                fee,
+                description
+            }
+            fs.unlink(pic);
+        }
+        db.fnUpdate("product", {"_id" : new db.ObjectID(id)} , updateJson, (err, data) => {
+            if(!err){
+                res.redirect("/product")
+            }
+        })
+    })
+})
+
+//删除功能
+app.get("/productdelete", (req, res) => {
+    //接受要删除的商品编号
+    var id = req.query.id;
+    console.log(id)
+    db.fnFind("product", {"_id":new db.ObjectID(id)}, (err, data) => {
+        console.log(data)
+    })
+    db.fnDelete("product", {"_id" : new db.ObjectID(id)}, (err, data) => {
+        if(!err){
+            res.redirect("/product");
+        }
+    })
 })
 
 //搜索功能
@@ -149,6 +213,7 @@ app.post("/search", (req, res) => {
         })
     })
 })
+
 
 
 app.listen(8000, () => {
